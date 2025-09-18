@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Savings | Expenses Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        green: {
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            700: '#047857',
+                            800: '#065f46',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation Bar at the very top -->
+    <nav class="w-full bg-white shadow mb-8">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-700">Expenses Tracker</div>
+            <ul class="flex space-x-6">
+                <li><a href="/" class="text-gray-600 hover:text-blue-600">Home</a></li>
+                <li><a href="/logout" class="text-gray-600 hover:text-blue-600">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 mb-8">
+        <div class="flex flex-col md:flex-row gap-6">
+            <!-- Left Column - Form -->
+            <div class="w-full md:w-1/3">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Savings</h2>
+                    <form id="savingsForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="date">
+                                Date
+                            </label>
+                            <input type="date" id="date" required
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="category">
+                                Category
+                            </label>
+                            <div class="flex gap-2">
+                                <select id="category"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                    <option value="">Select a category</option>
+                                    <option value="Emergency Fund">Emergency Fund</option>
+                                    <option value="Retirement">Retirement</option>
+                                    <option value="Vacation">Vacation</option>
+                                    <option value="Education">Education</option>
+                                    <option value="Investment">Investment</option>
+                                </select>
+                                <button type="button" id="addCategoryBtn"
+                                    class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 hidden" id="newCategoryInput">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="newCategory">
+                                New Category
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text" id="newCategory" placeholder="Enter new category"
+                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <button type="button" id="saveCategoryBtn"
+                                    class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="amount">
+                                Amount (₹)
+                            </label>
+                            <input type="number" id="amount" min="0" step="0.01" required
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                placeholder="0.00">
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                                Description
+                            </label>
+                            <textarea id="description" rows="3"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                placeholder="Add any details about this savings"></textarea>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <button type="submit"
+                                class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Add Savings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="bg-white p-6 rounded-lg shadow mt-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Savings Summary</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <p class="text-sm text-green-700">Total Savings</p>
+                            <p class="text-2xl font-bold text-green-800">₹<span id="totalSavings">0</span></p>
+                        </div>
+                        <div class="bg-blue-100 p-4 rounded-lg">
+                            <p class="text-sm text-blue-700">Savings Goals</p>
+                            <p class="text-2xl font-bold text-blue-800">₹<span id="savingsGoal">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Savings List -->
+            <div class="w-full md:w-2/3">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-700">Savings History</h2>
+                        <div class="flex gap-2">
+                            <input type="text" id="searchInput" placeholder="Search savings..."
+                                class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <button id="filterBtn"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead>
+                                <tr>
+                                    <th
+                                        class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th
+                                        class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Category
+                                    </th>
+                                    <th
+                                        class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Description
+                                    </th>
+                                    <th
+                                        class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Amount
+                                    </th>
+                                    <th
+                                        class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="savingsList" class="text-gray-700">
+                                <!-- Data will be populated here -->
+                                <tr>
+                                    <td colspan="5" class="text-center py-4" id="noDataMessage">
+                                        No savings records found. Add your first savings above.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="flex justify-between items-center mt-6">
+                        <div class="text-sm text-gray-700">
+                            Showing <span id="itemsCount">0</span> of <span id="totalItems">0</span> entries
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded">
+                                Previous
+                            </button>
+                            <button class="bg-green-700 hover:bg-green-800 text-white font-bold py-1 px-3 rounded">
+                                1
+                            </button>
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded">
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Sample data for demonstration
+            const sampleSavings = [
+                { id: 1, date: '2023-10-15', category: 'Emergency Fund', amount: 5000, description: 'Monthly emergency fund contribution' },
+                { id: 2, date: '2023-10-10', category: 'Retirement', amount: 7500, description: 'Retirement account deposit' },
+                { id: 3, date: '2023-10-05', category: 'Vacation', amount: 3000, description: 'Save for year-end vacation' },
+                { id: 4, date: '2023-10-01', category: 'Investment', amount: 10000, description: 'Stock market investment' }
+            ];
+
+            // Initialize savings data
+            let savingsData = JSON.parse(localStorage.getItem('savingsData')) || sampleSavings;
+            let categories = JSON.parse(localStorage.getItem('savingsCategories')) ||
+                ['Emergency Fund', 'Retirement', 'Vacation', 'Education', 'Investment'];
+
+            // DOM Elements
+            const savingsForm = document.getElementById('savingsForm');
+            const categorySelect = document.getElementById('category');
+            const addCategoryBtn = document.getElementById('addCategoryBtn');
+            const newCategoryInput = document.getElementById('newCategoryInput');
+            const newCategoryField = document.getElementById('newCategory');
+            const saveCategoryBtn = document.getElementById('saveCategoryBtn');
+            const savingsList = document.getElementById('savingsList');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const totalSavingsElement = document.getElementById('totalSavings');
+
+            // Initialize categories dropdown
+            function initCategories() {
+                // Clear existing options except the first one
+                while (categorySelect.options.length > 1) {
+                    categorySelect.remove(1);
+                }
+
+                // Add categories from the array
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categorySelect.appendChild(option);
+                });
+            }
+
+            // Calculate and display total savings
+            function calculateTotalSavings() {
+                const total = savingsData.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+                totalSavingsElement.textContent = total.toLocaleString('en-IN');
+            }
+
+            // Display savings in the table
+            function displaySavings() {
+                if (savingsData.length === 0) {
+                    noDataMessage.style.display = 'table-cell';
+                    document.getElementById('itemsCount').textContent = '0';
+                    document.getElementById('totalItems').textContent = '0';
+                    return;
+                }
+
+                noDataMessage.style.display = 'none';
+                savingsList.innerHTML = '';
+
+                savingsData.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.classList.add('hover:bg-gray-50');
+
+                    // Format date for display
+                    const dateObj = new Date(item.date);
+                    const formattedDate = dateObj.toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    row.innerHTML = `
+                        <td class="py-3 px-4 border-b border-gray-200">${formattedDate}</td>
+                        <td class="py-3 px-4 border-b border-gray-200">
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">${item.category}</span>
+                        </td>
+                        <td class="py-3 px-4 border-b border-gray-200">${item.description}</td>
+                        <td class="py-3 px-4 border-b border-gray-200 font-medium">₹${parseFloat(item.amount).toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-4 border-b border-gray-200">
+                            <button class="text-blue-600 hover:text-blue-900 mr-2 edit-btn" data-id="${item.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${item.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+
+                    savingsList.appendChild(row);
+                });
+
+                document.getElementById('itemsCount').textContent = savingsData.length;
+                document.getElementById('totalItems').textContent = savingsData.length;
+
+                // Add event listeners to delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function () {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        deleteSavings(id);
+                    });
+                });
+            }
+
+            // Add new savings
+            savingsForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const date = document.getElementById('date').value;
+                const category = document.getElementById('category').value;
+                const amount = document.getElementById('amount').value;
+                const description = document.getElementById('description').value;
+
+                if (!date || !category || !amount) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+
+                const newEntry = {
+                    id: savingsData.length > 0 ? Math.max(...savingsData.map(item => item.id)) + 1 : 1,
+                    date,
+                    category,
+                    amount: parseFloat(amount),
+                    description
+                };
+
+                savingsData.push(newEntry);
+                localStorage.setItem('savingsData', JSON.stringify(savingsData));
+
+                displaySavings();
+                calculateTotalSavings();
+
+                // Reset form
+                savingsForm.reset();
+            });
+
+            // Delete savings entry
+            function deleteSavings(id) {
+                if (confirm('Are you sure you want to delete this savings entry?')) {
+                    savingsData = savingsData.filter(item => item.id !== id);
+                    localStorage.setItem('savingsData', JSON.stringify(savingsData));
+                    displaySavings();
+                    calculateTotalSavings();
+                }
+            }
+
+            // Show new category input
+            addCategoryBtn.addEventListener('click', function () {
+                newCategoryInput.classList.remove('hidden');
+                newCategoryField.focus();
+            });
+
+            // Save new category
+            saveCategoryBtn.addEventListener('click', function () {
+                const newCategory = newCategoryField.value.trim();
+
+                if (!newCategory) {
+                    alert('Please enter a category name');
+                    return;
+                }
+
+                if (categories.includes(newCategory)) {
+                    alert('This category already exists');
+                    return;
+                }
+
+                categories.push(newCategory);
+                localStorage.setItem('savingsCategories', JSON.stringify(categories));
+
+                initCategories();
+
+                // Select the new category
+                categorySelect.value = newCategory;
+
+                // Hide the input field
+                newCategoryInput.classList.add('hidden');
+                newCategoryField.value = '';
+            });
+
+            // Initialize the page
+            initCategories();
+            displaySavings();
+            calculateTotalSavings();
+        });
+    </script>
+</body>
+
+</html>
