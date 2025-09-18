@@ -17,7 +17,7 @@ app.use(cookieParser()); // Add this after express.json()
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "src"));
 
-app.get("/", (req, res) => {
+app.get("https://yusufmukhi.github.io/yusufmukhi1.github.io/", (req, res) => {
   // Check if user is remembered
   if (req.cookies.email === "yusufmukhi1@gmail.com") {
     return res.render("home.ejs");
@@ -48,3 +48,4 @@ app.post("/expenses", (req, res) => {});
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
